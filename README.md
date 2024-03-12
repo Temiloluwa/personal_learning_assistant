@@ -1,93 +1,69 @@
-# personal_learning_assistant
+# Personal Learning Assistant
 
+## Overview
 
+The Personal Learning Assistant is an innovative application designed to enhance the learning experience by providing personalized assistance, generating questions from PDF documents, and offering feedback based on user responses. Whether you're a student, educator, or lifelong learner, our assistant is here to support your educational journey.
 
-## Getting started
+## Features
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+- **PDF Document Upload**: Users can upload PDF documents containing study materials, lecture notes, or textbooks to the application.
+- **Question Generation**: The assistant automatically generates questions from the uploaded PDF documents, helping users test their understanding of the material.
+- **Feedback System**: Users receive immediate feedback on their responses to the generated questions, enabling them to identify areas for improvement and reinforce their learning.
+- **Learning Progress Tracking**: The application tracks users' learning progress over time, allowing them to monitor their performance and set learning goals.
+- **Customizable Settings**: Users can customize their learning experience by adjusting settings such as question difficulty level, feedback frequency, and study schedule.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Technologies
 
-## Add your files
+- **Frontend**: The frontend of the application is built with Streamlit.
+- **Backend**: The backend is powered by FastAPI, MongoDB, and Flask-CORS, providing robust data storage, retrieval, and processing capabilities.
+- **Machine Learning**: The application utilizes machine learning libraries such as TensorFlow and Keras for natural language processing (NLP) tasks, including question generation and feedback analysis.
+- **Deployment & DevOps**: Docker and AWS (Amazon Web Services) are used for containerization and cloud deployment, with GitHub Actions for continuous integration and deployment (CI/CD) pipelines.
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.com/amazing_ai/personal_learning_assistant.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://gitlab.com/amazing_ai/personal_learning_assistant/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
 
 ## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+Once the application is running, users can:
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+- Upload PDF documents containing study materials.
+- Generate questions from the uploaded documents and answer them.
+- Receive immediate feedback on their responses and track their learning progress.
+- Customize settings to tailor their learning experience.
+
+## API Documentation
+
+For detailed documentation on the API endpoints and functionalities, refer to the [API Documentation](link-to-api-docs).
 
 ## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+Contributions to the Personal Learning Assistant project are welcome! To contribute, please follow these guidelines:
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+1. Fork the repository and create a new branch for your feature or bug fix.
+2. Make your changes and ensure all tests pass.
+3. Submit a pull request with a clear description of your changes and why they are necessary.
+4. Participate in code reviews and address any feedback or comments from the maintainers.
 
 ## License
-For open source projects, say how it is licensed.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+The Personal Learning Assistant is licensed under the [MIT License](link-to-license). See the [LICENSE](link-to-license-file) file for details.
+
+## Credits
+
+Special thanks to the following individuals and organizations for their contributions to the Personal Learning Assistant:
+
+- [Name or Organization]: [Contribution Description]
+- [Name or Organization]: [Contribution Description]
+
+## Acknowledgments
+
+We would like to express our gratitude to the following individuals and organizations for their support and inspiration:
+
+- [Name or Organization]: [Acknowledgment Description]
+- [Name or Organization]: [Acknowledgment Description]
+
+## Contact
+
+For questions, feedback, or support inquiries, please contact us at [email@example.com].
+
+## Changelog
+
+See the [CHANGELOG.md](link-to-changelog-file) file for a history of changes, additions, and improvements made to the Personal Learning Assistant in each release.
