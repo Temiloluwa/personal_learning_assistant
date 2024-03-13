@@ -76,9 +76,6 @@ def update_learning_progress() -> dict:
 if "all_questions_info" not in st.session_state:
     st.session_state["all_questions_info"] = {}
 
-if "current_question_info" not in st.session_state:
-    st.session_state["current_question_info"] = {"question": None, "answer": None, "feedback": None, "is_correct_answer": None}
-
 if "current_question" not in st.session_state:
     st.session_state["current_question"] = 0
 
@@ -153,7 +150,6 @@ def show_feedback():
         st.write(feedback)
         
 
-
 def main():
     # show question and answer
     show_question()
@@ -164,8 +160,6 @@ def main():
 st.set_page_config(layout="wide")
 st.image("asset/imgs/hero.jpg")
 st.title('Personal Learning Assistant')
-
-st.write(st.session_state)
 
 with st.container():
     # Subheader: Instructions
@@ -186,15 +180,21 @@ uploaded_file = st.sidebar.file_uploader('Upload a PDF Document', type=['pdf'])
 with col1:
     if uploaded_file is not None:
         main()
+        num_state_items = len(st.session_state["all_questions_info"])
+        st.write(f"Number of questions: {num_state_items}")
+        current_question = st.session_state["current_question"]
+        current_question_info = get_value_at_index(st.session_state["all_questions_info"], current_question)
+        all_current_question_values_are_not_none = all_values_are_not_none(current_question_info)
         
-        if len(st.session_state["all_questions_info"]) > 0:
+        if num_state_items > 1 and all_current_question_values_are_not_none:
             if st.button('Previous Question'):
-                st.session_state["current_question"] -= 1
+                st.session_state["current_question"] = min(0, st.session_state["current_question"] - 1)
                 st.rerun()
        
-        if st.session_state["current_question"] < len(st.session_state["all_questions_info"]):
+        if  all_current_question_values_are_not_none:
             if st.button('Next Question'):
-                st.session_state["current_question"] += 1
+                update_learning_progress()
+                st.session_state["current_question"] = max(0, st.session_state["current_question"] + 1)
                 st.rerun()
 
                 
@@ -206,9 +206,10 @@ if uploaded_file is not None:
     st.sidebar.header('Uploaded PDF Document')
     st.sidebar.write(f"**Filename:** {uploaded_file.name}")
 
-    if len(st.session_state["all_questions_info"]) > 0:
-        update_learning_progress()
+    if num_state_items > 1:
         st.sidebar.header('Learning Progress')
         st.sidebar.write(f'Total Questions Answered: {st.session_state["total_questions"]}')
         st.sidebar.write(f'Correct Answers: {st.session_state["correct_answers"]}')
         st.sidebar.write(f'Incorrect Answers: {st.session_state["incorrect_answers"]}')
+
+st.write(st.session_state)
