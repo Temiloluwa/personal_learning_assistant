@@ -3,24 +3,53 @@ Authors: Temiloluwa Adeoti
 Date: March 13, 2024
 
 This module contains the frontend code of personal learning assistant
+
+Below are placeholder functions that should be replaced with the right REST API Calls
 """
 
-import streamlit as st
+import time
 import random
+import streamlit as st
 
-## dummy functions to be replace and imported from src folder
-def get_value_at_index(index):
-    return st.session_state["all_questions_info"].get(index, {"question": None, "answer": None, "feedback": None, "is_correct_answer": None})
+# Utility functions
+
+def get_ques_info_from_state(key: int):
+    """
+        Gets the current question infomation if available
+        st.session_state["all_questions_info"] is a dictionary of dictionaries
+
+        Each key is a integer and value as a dictionary with question, answer, feedback, is_correct_answer
+    
+        example:
+        {
+            {
+            "question": "What is the capital of France?",
+            "answer": "Paris",
+            "feedback": "Your answer is correct!",
+            "is_correct_answer": True
+            }
+        }
+
+        if the key is not present, it return a dictionary whose values are all null
+    """
+    return st.session_state["all_questions_info"].get(key, \
+        {"question": None, "answer": None, "feedback": None, "is_correct_answer": None})
       
-def check_valid_ques_dict(current_question_info: dict):
+
+def check_valid_ques_info(current_question_info: dict):
+    """
+    Checks if all the values in current_question_info are not None
+    It excludes the is_correct_answer key
+    """
     for k, v in current_question_info.items():
         # exclude is_correct_answer
         if k != "is_correct_answer" and v is None:
             return False
     return True
 
-def ingest_document(document: str=""):
-    pass
+
+# GET REST API METHODS
+
 
 def get_question(document: str=""):
     # List of 5 random questions
@@ -42,18 +71,12 @@ def get_answer(answer=""):
 
     return answer
 
-
-def post_question_response_feedback(
-    document="",
-    question_info=""):
-    pass
-
-
 def get_feedback(question: str="", answer: str=""):
     is_correct_answer = random.choice([True, False])
     feedback =  "Your answer is correct!" if is_correct_answer else "Your answer is incorrect. Here is an explanation"
 
     return feedback, is_correct_answer
+
 
 def get_summary(document: str=""):
     summary = """
@@ -65,18 +88,47 @@ def get_summary(document: str=""):
     return summary
 
 
-def update_learning_progress() -> dict:
-    st.session_state['total_questions'] = len(st.session_state["all_questions_info"])
-    correct_answers = sum(1 for item in st.session_state["all_questions_info"].values() if item.get("is_correct_answer") is True)
-    st.session_state['correct_answers'] = correct_answers
-    st.session_state['incorrect_answers'] = st.session_state['total_questions'] - correct_answers
+def post_question_info_to_db(current_question_info:dict):
+    """Simulate Posting Question to DB"""
+    with st.status("Posting Question Info to Db...", expanded=True) as status:
+        st.write("Posting")
+        time.sleep(1)
 
 
+def post_document_for_ingestion(document):
+    """
+    Function should
+    1. upload document to s3 for ingestion to vector database
+    """
+    progress_text = "Preparing document {document.name}. Please wait."
+    my_bar = st.progress(0, text=progress_text)
+
+    for percent_complete in range(100):
+        time.sleep(0.02)
+        my_bar.progress(percent_complete + 1, text=progress_text)
+    time.sleep(1)
+    my_bar.empty()
+
+
+def update_learning_progress():
+    total_questions = len(st.session_state.all_questions_info)
+    correct_answers = sum(1 for item in st.session_state.all_questions_info.values() if item.get("is_correct_answer") is True)
+    incorrect_answers = total_questions - correct_answers
+    
+    st.session_state.total_questions = total_questions
+    st.session_state.correct_answers = correct_answers
+    st.session_state.incorrect_answers = incorrect_answers
+
+
+# Initialize State Variables
 if "all_questions_info" not in st.session_state:
     st.session_state["all_questions_info"] = {}
 
 if "current_question" not in st.session_state:
     st.session_state["current_question"] = 0
+
+if "file_info" not in st.session_state:
+    st.session_state["file_info"] = {}
 
 state_keys = [
     'total_questions',
@@ -139,7 +191,7 @@ def show_feedback(current_question_info):
 
 def main():
     current_question = st.session_state["current_question"]
-    current_question_info = get_value_at_index(current_question)
+    current_question_info = get_ques_info_from_state(current_question)
     current_question_info = show_question(current_question_info)
     current_question_info = show_answer(current_question_info)
     current_question_info = show_feedback(current_question_info)
@@ -169,13 +221,19 @@ col1, col2  = st.columns(2)
 uploaded_file = st.sidebar.file_uploader('Upload a PDF Document', type=['pdf'])
 
 if uploaded_file is not None:
+    # ingest file
+    if not st.session_state["file_info"]:
+        post_document_for_ingestion(uploaded_file)
+        st.session_state["file_info"] = {"name": uploaded_file.name}
+
     with col1:
         current_question_info = main()
-        is_valid_ques_dict = check_valid_ques_dict(current_question_info)
+        is_valid_ques_dict = check_valid_ques_info(current_question_info)
 
         if is_valid_ques_dict and st.session_state["current_question"] not in st.session_state["all_questions_info"]:
             st.session_state["all_questions_info"][st.session_state["current_question"]] = current_question_info
             update_learning_progress()
+            post_question_info_to_db(current_question_info)
         
         if st.session_state["current_question"] != 0 and is_valid_ques_dict:
             if st.button('Previous Question'):
@@ -200,5 +258,3 @@ if uploaded_file is not None:
         st.sidebar.write(f'Total Questions Answered: {st.session_state["total_questions"]}')
         st.sidebar.write(f'Correct Answers: {st.session_state["correct_answers"]}')
         st.sidebar.write(f'Incorrect Answers: {st.session_state["incorrect_answers"]}')
-
-    st.write(st.session_state)
