@@ -88,6 +88,15 @@ def get_summary(document: str=""):
     return summary
 
 
+def get_document_info_from_db(document):
+    document_details = {"user": "default_user",
+            "name": document.name,
+            "type": document.type,
+            "size": document.size}
+
+    return document_details
+
+
 def post_question_info_to_db(current_question_info:dict):
     """Simulate Posting Question to DB"""
     with st.status("Posting Question Info to Db...", expanded=True) as status:
@@ -100,7 +109,7 @@ def post_document_for_ingestion(document):
     Function should
     1. upload document to s3 for ingestion to vector database
     """
-    progress_text = "Preparing document {document.name}. Please wait."
+    progress_text = f"Preparing document {document.name}. Please wait."
     my_bar = st.progress(0, text=progress_text)
 
     for percent_complete in range(100):
@@ -108,6 +117,30 @@ def post_document_for_ingestion(document):
         my_bar.progress(percent_complete + 1, text=progress_text)
     time.sleep(1)
     my_bar.empty()
+
+
+def check_if_document_has_been_ingested(document):
+    """
+    Function should
+    1. check if document has been ingested to vector database
+    """
+    get_document_info_from_db(document)
+    
+    return False 
+
+
+def check_if_new_document_has_been_added(document):
+    """
+    Function should
+    1. check if document already exists in state
+    """
+    file_info = st.session_state["file_info"]
+    if file_info:
+        for k, v in file_info.items():
+            if v != getattr(document, k, None):
+                return False
+        return True
+    return False
 
 
 def update_learning_progress():
@@ -221,11 +254,16 @@ col1, col2  = st.columns(2)
 uploaded_file = st.sidebar.file_uploader('Upload a PDF Document', type=['pdf'])
 
 if uploaded_file is not None:
-    # ingest file
-    if not st.session_state["file_info"]:
-        post_document_for_ingestion(uploaded_file)
-        st.session_state["file_info"] = {"name": uploaded_file.name}
-
+    # add document information to state
+    if not check_if_new_document_has_been_added(uploaded_file):
+        st.session_state["file_info"] = {"name": uploaded_file.name,
+                                        "type": uploaded_file.type,
+                                        "size": uploaded_file.size}
+        
+        # ingest file
+        if not check_if_document_has_been_ingested(uploaded_file):
+            post_document_for_ingestion(uploaded_file)
+    
     with col1:
         current_question_info = main()
         is_valid_ques_dict = check_valid_ques_info(current_question_info)
@@ -235,16 +273,18 @@ if uploaded_file is not None:
             update_learning_progress()
             post_question_info_to_db(current_question_info)
         
-        if st.session_state["current_question"] != 0 and is_valid_ques_dict:
-            if st.button('Previous Question'):
-                st.session_state["current_question"] = max(0, st.session_state["current_question"] - 1)
-                st.rerun()
+        col_previous, col_next = st.columns(2)
+        with col_previous:
+            if st.session_state["current_question"] != 0 and is_valid_ques_dict:
+                if st.button('Previous Question'):
+                    st.session_state["current_question"] = max(0, st.session_state["current_question"] - 1)
+                    st.rerun()
         
-        if is_valid_ques_dict and st.button('Next Question'):
-            st.session_state["current_question"] = max(0, st.session_state["current_question"] + 1)
-            st.rerun()
-
-                    
+        with col_next:
+            if is_valid_ques_dict and st.button('Next Question'):
+                st.session_state["current_question"] = max(0, st.session_state["current_question"] + 1)
+                st.rerun()
+     
     with col2:
         st.subheader("Document Summary")
         summary = get_summary(uploaded_file)
