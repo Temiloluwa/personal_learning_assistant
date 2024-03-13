@@ -9,11 +9,10 @@ import streamlit as st
 import random
 
 ## dummy functions to be replace and imported from src folder
-
-def get_value_at_index(dictionary, index):
-    return dictionary.get(index, {"question": None, "answer": None, "feedback": None, "is_correct_answer": None})
+def get_value_at_index(index):
+    return st.session_state["all_questions_info"].get(index, {"question": None, "answer": None, "feedback": None, "is_correct_answer": None})
       
-def all_values_are_not_none(current_question_info: dict):
+def check_valid_ques_dict(current_question_info: dict):
     for k, v in current_question_info.items():
         # exclude is_correct_answer
         if k != "is_correct_answer" and v is None:
@@ -47,7 +46,7 @@ def get_answer(answer=""):
 def post_question_response_feedback(
     document="",
     question_info=""):
-    st.session_state["question_information"].append(question_info)
+    pass
 
 
 def get_feedback(question: str="", answer: str=""):
@@ -84,42 +83,31 @@ state_keys = [
     'correct_answers',
     'incorrect_answers',
 ]
+
 for key in state_keys:
     if key not in st.session_state:
         st.session_state[key] = 0
 
 
-def show_question():
-    # get the current question number
-    current_question = st.session_state["current_question"]
-    # get the dictionary from the list of all questions using the current question number
-    current_question_info = get_value_at_index(st.session_state["all_questions_info"], current_question)
-    # get the actual question
-    question = current_question_info.get("question")
+def show_question(current_question_info):
+    question = current_question_info.get("question", None)
     # if the question does not exist
     if not question:
         # get the question from api
         question = get_question()
         # update the question in the current question info dictionary
-        st.session_state["all_questions_info"][current_question] = {"question": question, "answer": None, "feedback": None, "is_correct_answer": None}
+        current_question_info["question"] = question
     
     st.subheader('Generated Question:')
     st.write(question)
 
+    return current_question_info
+
     
-def show_answer():
-    # get the current question number
-    current_question = st.session_state["current_question"]
-    # get the dictionary from the list of all questions using the current question number
-    current_question_info = get_value_at_index(st.session_state["all_questions_info"], current_question)
-    # get the actual question for the current question
-    question = current_question_info.get("question")
-    # get the actual answer for the current question
-    if question is None:
-        raise ValueError("Question is None")
+def show_answer(current_question_info):
+    question = current_question_info.get("question", None)
     
     answer = current_question_info.get("answer")
-   
     if question and not answer:
         # get answer from user
         answer = get_answer()
@@ -127,34 +115,36 @@ def show_answer():
     if answer:
         st.subheader('Your Answer:')
         st.write(answer)
-        # update the answer in the current question info dictionary
-        st.session_state["all_questions_info"][current_question] = {"question": question, "answer": answer, "feedback": None, "is_correct_answer": None}
+        current_question_info["answer"] = answer
     
-    return answer
+    return current_question_info
     
-def show_feedback():
-    # get the actual feedback, question and answer for the current question, 
-    current_question = st.session_state["current_question"]
-    current_question_info = get_value_at_index(st.session_state["all_questions_info"], current_question)
+def show_feedback(current_question_info):
+    question = current_question_info.get("question", None)
+    answer = current_question_info.get("answer", None)
+    feedback = current_question_info.get("feedback", None)
     
-    question = current_question_info.get("question")
-    answer = current_question_info.get("answer")
-    feedback = current_question_info.get("feedback")
-    
-    if question and answer and not feedback:
+    if question and answer and feedback is None:
         feedback, is_correct_answer = get_feedback(question, answer)
-        st.session_state["all_questions_info"][current_question] = {"question": question, "answer": answer, "feedback": feedback, "is_correct_answer": is_correct_answer}
+        current_question_info["feedback"] = feedback
+        current_question_info["is_correct_answer"] = is_correct_answer
+        update_learning_progress()
 
     if feedback:
         st.subheader('Feedback:')
         st.write(feedback)
+
+    return current_question_info
         
 
 def main():
-    # show question and answer
-    show_question()
-    show_answer()
-    show_feedback()
+    current_question = st.session_state["current_question"]
+    current_question_info = get_value_at_index(current_question)
+    current_question_info = show_question(current_question_info)
+    current_question_info = show_answer(current_question_info)
+    current_question_info = show_feedback(current_question_info)
+
+    return current_question_info
             
 
 st.set_page_config(layout="wide")
@@ -177,39 +167,38 @@ with st.container():
 
 col1, col2  = st.columns(2)
 uploaded_file = st.sidebar.file_uploader('Upload a PDF Document', type=['pdf'])
-with col1:
-    if uploaded_file is not None:
-        main()
-        num_state_items = len(st.session_state["all_questions_info"])
-        st.write(f"Number of questions: {num_state_items}")
-        current_question = st.session_state["current_question"]
-        current_question_info = get_value_at_index(st.session_state["all_questions_info"], current_question)
-        all_current_question_values_are_not_none = all_values_are_not_none(current_question_info)
-        
-        if num_state_items > 1 and all_current_question_values_are_not_none:
-            if st.button('Previous Question'):
-                st.session_state["current_question"] = min(0, st.session_state["current_question"] - 1)
-                st.rerun()
-       
-        if  all_current_question_values_are_not_none:
-            if st.button('Next Question'):
-                update_learning_progress()
-                st.session_state["current_question"] = max(0, st.session_state["current_question"] + 1)
-                st.rerun()
 
-                
 if uploaded_file is not None:
+    with col1:
+        current_question_info = main()
+        is_valid_ques_dict = check_valid_ques_dict(current_question_info)
+
+        if is_valid_ques_dict and st.session_state["current_question"] not in st.session_state["all_questions_info"]:
+            st.session_state["all_questions_info"][st.session_state["current_question"]] = current_question_info
+            update_learning_progress()
+        
+        if st.session_state["current_question"] != 0 and is_valid_ques_dict:
+            if st.button('Previous Question'):
+                st.session_state["current_question"] = max(0, st.session_state["current_question"] - 1)
+                st.rerun()
+        
+        if is_valid_ques_dict and st.button('Next Question'):
+            st.session_state["current_question"] = max(0, st.session_state["current_question"] + 1)
+            st.rerun()
+
+                    
     with col2:
         st.subheader("Document Summary")
         summary = get_summary(uploaded_file)
         st.write(summary)
+    
     st.sidebar.header('Uploaded PDF Document')
     st.sidebar.write(f"**Filename:** {uploaded_file.name}")
 
-    if num_state_items > 1:
+    if len(st.session_state["all_questions_info"]) > 1:
         st.sidebar.header('Learning Progress')
         st.sidebar.write(f'Total Questions Answered: {st.session_state["total_questions"]}')
         st.sidebar.write(f'Correct Answers: {st.session_state["correct_answers"]}')
         st.sidebar.write(f'Incorrect Answers: {st.session_state["incorrect_answers"]}')
 
-st.write(st.session_state)
+    st.write(st.session_state)
