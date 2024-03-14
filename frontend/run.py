@@ -49,8 +49,6 @@ def check_valid_ques_info(current_question_info: dict):
 
 
 # GET REST API METHODS
-
-
 def get_question(document: str=""):
     # List of 5 random questions
     questions = [
