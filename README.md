@@ -2,12 +2,12 @@
 
 ## Overview
 
-The Personal Learning Assistant is an innovative application designed to enhance the learning experience by providing personalized assistance, generating questions from PDF documents, and offering feedback based on user responses. Whether you're a student, educator, or lifelong learner, our assistant is here to support your educational journey.
+The Personal Learning Assistant is an innovative application designed to enhance the learning experience by providing personalized assistance, generating questions from documents, and offering feedback based on user responses. Whether you're a student, educator, or lifelong learner, our assistant is here to support your learning journey.
 
 ## Features
 
-- **PDF Document Upload**: Users can upload PDF documents containing study materials, lecture notes, or textbooks to the application.
-- **Question Generation**: The assistant automatically generates questions from the uploaded PDF documents, helping users test their understanding of the material.
+- **Document Upload**: Users can upload documents containing study materials, lecture notes, or textbooks to the application.
+- **Question Generation**: The assistant automatically generates questions from the uploaded documents, helping users test their understanding of the material.
 - **Feedback System**: Users receive immediate feedback on their responses to the generated questions, enabling them to identify areas for improvement and reinforce their learning.
 - **Learning Progress Tracking**: The application tracks users' learning progress over time, allowing them to monitor their performance and set learning goals.
 - **Customizable Settings**: Users can customize their learning experience by adjusting settings such as question difficulty level, feedback frequency, and study schedule.
@@ -19,12 +19,14 @@ The Personal Learning Assistant is an innovative application designed to enhance
 - **Machine Learning**: The application utilizes machine learning libraries such as TensorFlow and Keras for natural language processing (NLP) tasks, including question generation and feedback analysis.
 - **Deployment & DevOps**: Docker and AWS (Amazon Web Services) are used for containerization and cloud deployment, with GitHub Actions for continuous integration and deployment (CI/CD) pipelines.
 
+## System Design 
+![system design workflow](resources/images/system_design.png)
 
 ## Usage
 
 Once the application is running, users can:
 
-- Upload PDF documents containing study materials.
+- Upload documents containing study materials.
 - Generate questions from the uploaded documents and answer them.
 - Receive immediate feedback on their responses and track their learning progress.
 - Customize settings to tailor their learning experience.
