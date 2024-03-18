@@ -1,5 +1,5 @@
 """
-Authors: Temiloluwa Adeoti
+Authors: Temiloluwa Adeoti, John Robert 
 Date: March 13, 2024
 
 This module contains the frontend code of personal learning assistant
